@@ -6,12 +6,14 @@ Hardware Overview
 The following LZC design uses a ‘divide and conquer’ algorithm that enables it to be recursively instantiated as a Verilog module. The 8-bit input is continually split in half, as a left-hand side (LHS) and right-hand side (RHS), until the input signal is 2-bits wide. Once the input signal is 2-bits wide, it is fed into a multiplexer that returns the corresponding 2-bit LZC. The LHS and RHS are then combined and decoded to output the leading zero count for the next stage. This is repeated until the last decoding at the top level.
 
 ## 8-Bit Logic Diagram using Digital
-![](./images/Fig1.PNG?raw=true)
+
+![](./images/Fig1.png)
 
 Fig. 1 Combinational logic for an 8-bit LZC using only multiplexers and bit concatenation wires.
 
 ## 8-Bit LZC Top-Level using Verilog
-![](./images/Fig2.PNG?raw=true)
+
+![](./images/Fig2.png)
 
 Fig.2 Verilog LZC top-level module. The IO encapsulates all signals and parameters for recursive module instantiation. The input width is 8 and the output width is log2(8)+1 = 4.
 
@@ -22,12 +24,14 @@ The Verilog leading_zero_cnt module includes a generate statement that allows fo
 When a hardware module is instantiated recursively, all the wires and logic must be determined at HDL compile time. This means that the continuous splitting of the input until it reaches the base case is done 'instantaneously' with wires and does not take time to procedurally reach. The top-level input is routed directly into the base case because all other logic depends on the base case output.
 
 
-![](./images/Fig3.PNG?raw=true)
+![](./images/Fig3.png)
+
 Fig. 3 If the Input Width (WI_SZ) is equal to two bits, then instantiate base case multiplexer.
 
 The base case logic is simply a multiplexer that uses the 2-bit signal, 'in' , as a control signal to output the corresponding leading zeros.
 
-![](./images/Fig4.PNG?raw=true)
+![](./images/Fig4.png)
+
 Fig. 4 Multiplexer diagram of base case logic.
 
 The base case output is routed as either a LHS or RHS signal to the module that called it. In the module that called the base case, the LHS and RHS needs to be decoded into a single LZC output to propagate to the next calling module. This is done with logic instantiated within the 'Recursive Case'.
@@ -35,23 +39,27 @@ Recursive Case: Module Instantiation
 
 The recursive case splits its input signal into a LHS and RHS signal. The split signals are then used to instantiate the same module again.
 
-![](./images/Fig5.PNG?raw=true)
+![](./images/Fig5.png)
+
 Fig. 5 Verilog for the module instantiation and their corresponding parameters.
 
 The output LZC of the LHS and RHS modules that are recursively instantiated need to be decoded into the next LZC output. The following Verilog decodes the LHS and RHS LZC into a single LZC output.
 
-![](./images/Fig6.PNG?raw=true)
+![](./images/Fig6.png)
+
 Fig. 6 Verilog for decoding the LZC output from the LHS and RHS modules. Only a single multiplexer is used, along with wires for concatenating bits together.
 
 The following is the logic diagram that corresponds to the Verilog in Fig. 6.
 
 
-![](./images/Fig7.PNG?raw=true)
+![](./images/Fig7.png)
+
 Fig. 7 displays the logic diagram corresponding to the Verilog in Fig. 6. There are some extra bit concatenation wires in the diagram compared to the Verilog. Such as {1, RHS_no_MSB} really being {01, RHS_no_MSB}. This is needed for simulation using 'Digital'.
 
 The reasoning for this logic is explored below with a truth table for a 2-bit LHS/RHS.
 
-![](./images/Table1.PNG?raw=true)
+![](./images/Table1.png)
+
 Table 1. shows the LHS and RHS decoder logic with 2-bit Input, 3-bit Output and a 2-bit control signal. Note: “{}” is the concatenation operator in Verilog and “X” is don’t care.
 No alt text provided for this image
 
