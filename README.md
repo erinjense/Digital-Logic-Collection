@@ -1,2 +1,2 @@
 # Digital-Logic-Collection
-My collection of VHDL, Verilog, and SystemVerilog designs.
+A collection of VHDL, Verilog, and SystemVerilog designs.
